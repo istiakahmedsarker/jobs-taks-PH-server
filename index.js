@@ -53,17 +53,33 @@ async function run() {
                 { _id: id },
                 {
                     $set: todos,
-                    status:""
                 }
             );
             res.send(result);
+        });
+
+        app.patch("/updateTodoTask/:id", async (req, res) => {
+            const id = req.params.id;
+            const updatedTask = req.body;
+
+            try {
+                const result = await todoCollection.updateOne(
+                    { _id: new ObjectId(id) },
+                    { $set: updatedTask }
+                );
+
+                res.send(result);
+            } catch (error) {
+                console.error('Error updating task:', error);
+                res.status(500).send({ error: 'Internal Server Error' });
+            }
         });
 
         app.delete("/deleteTodo/:id", async (req, res) => {
             const id = req.params.id;
             const result = await todoCollection.deleteOne({ _id: new ObjectId(id) });
             res.send(result);
-            });
+        });
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
