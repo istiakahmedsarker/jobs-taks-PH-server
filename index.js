@@ -25,7 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        // await client.connect();
+        await client.connect();
 
         const userCollection = client.db("todo-list").collection("usersDb");
         const todoCollection = client.db("todo-list").collection("todosDb");
@@ -46,8 +46,24 @@ async function run() {
             const result = await todoCollection.find({ userEmail: email }).toArray();
             res.send(result);
         });
+        app.patch("/updateTodoStatus/:id", async (req, res) => {
+            const id = req.params.id;
+            const todos = req.body;
+            const result = await todoCollection.updateOne(
+                { _id: id },
+                {
+                    $set: todos,
+                    status:""
+                }
+            );
+            res.send(result);
+        });
 
-
+        app.delete("/deleteTodo/:id", async (req, res) => {
+            const id = req.params.id;
+            const result = await todoCollection.deleteOne({ _id: new ObjectId(id) });
+            res.send(result);
+            });
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
